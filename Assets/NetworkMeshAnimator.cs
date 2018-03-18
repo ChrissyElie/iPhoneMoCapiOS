@@ -7,7 +7,8 @@ public class NetworkMeshAnimator {
 
 	private UDPServer listner;
 	private SkinnedMeshRenderer meshTarget;
-	private UnityMainThreadDispatcher dispatcher;
+    private SkinnedMeshRenderer meshTargetTwo;
+    private UnityMainThreadDispatcher dispatcher;
 	private bool isAcceptingMessages = false;
 
 	private static NetworkMeshAnimator instance;
@@ -51,8 +52,9 @@ public class NetworkMeshAnimator {
 		Debug.Log("Started accepting messages");
 
 		meshTarget = GameObject.Find ("BlendShapeTarget").GetComponent<SkinnedMeshRenderer> ();
+        meshTargetTwo = GameObject.Find("BlendShapeTargetTwo").GetComponent<SkinnedMeshRenderer>();
 
-		if (meshTarget == null) {
+        if (meshTarget == null || meshTargetTwo == null) {
 			Debug.LogError ("Cannot find BlendShapeTarget. Have you added it to your scene?");
 			return;
 		}
@@ -78,7 +80,7 @@ public class NetworkMeshAnimator {
 
 	public IEnumerator SetBlendShapesOnMainThread(string messageString) {
 
-		foreach (string message in messageString.Split (new Char[] { '|' }))
+        foreach (string message in messageString.Split (new Char[] { '|' }))
 		{
 			var cleanString = message.Replace (" ", "").Replace ("msg:", "");
 			var strArray  = cleanString.Split (new Char[] {'-'});
@@ -86,14 +88,17 @@ public class NetworkMeshAnimator {
 			if (strArray.Length == 2) {
 				var weight = float.Parse (strArray.GetValue (1).ToString());
 
-				var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
-
+				var mappedShapeName = "Mesh_blendShape." + strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
 				var index = meshTarget.sharedMesh.GetBlendShapeIndex (mappedShapeName);
-
-				if (index > -1) {
+                var indexTwo = meshTargetTwo.sharedMesh.GetBlendShapeIndex(mappedShapeName);
+                if (index > -1) {
 					meshTarget.SetBlendShapeWeight (index, weight);
 				}
-			}
+                if (indexTwo > -1)
+                {
+                    meshTargetTwo.SetBlendShapeWeight(index, weight);
+                }
+            }
 		}
 
 		yield return null;
