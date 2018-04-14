@@ -8,6 +8,8 @@ public class NetworkMeshAnimator {
 	private UDPServer listner;
 	private SkinnedMeshRenderer meshTarget;
     private SkinnedMeshRenderer meshTargetTwo;
+    private SkinnedMeshRenderer meshTargetThree;
+    private SkinnedMeshRenderer meshTargetFour;
     private UnityMainThreadDispatcher dispatcher;
 	private bool isAcceptingMessages = false;
 
@@ -53,6 +55,8 @@ public class NetworkMeshAnimator {
 
 		meshTarget = GameObject.Find ("BlendShapeTarget").GetComponent<SkinnedMeshRenderer> ();
         meshTargetTwo = GameObject.Find("BlendShapeTargetTwo").GetComponent<SkinnedMeshRenderer>();
+        meshTargetThree = GameObject.Find("BlendShapeTargetThree").GetComponent<SkinnedMeshRenderer>();
+        meshTargetFour = GameObject.Find("BlendShapeTargetFour").GetComponent<SkinnedMeshRenderer>();
 
         if (meshTarget == null || meshTargetTwo == null) {
 			Debug.LogError ("Cannot find BlendShapeTarget. Have you added it to your scene?");
@@ -91,12 +95,20 @@ public class NetworkMeshAnimator {
 				var mappedShapeName = "Mesh_blendShape." + strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
 				var index = meshTarget.sharedMesh.GetBlendShapeIndex (mappedShapeName);
                 var indexTwo = meshTargetTwo.sharedMesh.GetBlendShapeIndex(mappedShapeName);
+                var indexThree = meshTargetThree.sharedMesh.GetBlendShapeIndex(mappedShapeName);
+                var indexFour = meshTargetFour.sharedMesh.GetBlendShapeIndex(mappedShapeName);
                 if (index > -1) {
 					meshTarget.SetBlendShapeWeight (index, weight);
-				}
-                if (indexTwo > -1)
+                }
+                if (indexTwo > -1) {
+                    meshTargetTwo.SetBlendShapeWeight(indexTwo, weight);
+                }
+                if (indexThree > -1) {
+                    meshTargetThree.SetBlendShapeWeight(indexThree, weight);
+                }
+                if (indexFour > -1)
                 {
-                    meshTargetTwo.SetBlendShapeWeight(index, weight);
+                    meshTargetFour.SetBlendShapeWeight(indexFour, weight);
                 }
             }
 		}
